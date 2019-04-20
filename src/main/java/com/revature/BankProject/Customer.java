@@ -11,7 +11,7 @@ public class Customer extends User{
 	}
 	
 	void testInheritance() {
-        System.out.println("printing user data from customer: "+ userName);
+        System.out.println("printing user data from customer: "+ name);
 	}
 	
 }

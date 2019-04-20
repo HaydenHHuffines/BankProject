@@ -4,6 +4,7 @@ public class USD {
 	private int cents = -1;
 	private long dollars = -1;
 	public String errorMsg = "-1";
+	private boolean isValid = false;
 
 	USD(String input) {
 
@@ -14,10 +15,19 @@ public class USD {
 		dollars = Long.parseLong(splitStr[0]);
 		cents = Integer.parseInt(splitStr[1]);
 
+		// todo extra check for cents length
 		if (splitStr.length > 2) {
 			errorMsg = "too many '.' symbols";
 		} else if (splitStr.length == 1) {
 			cents = 0;
+		}
+
+		if (dollars >= 0 && cents >= 0) {
+			isValid = true;
+		}
+
+		if (splitStr.length == 2 && splitStr[1].length() != 2) {
+			errorMsg = "only two decimal places after the period cents is permitted";
 		}
 
 		if (dollars == -1 || cents == -1) {
@@ -53,6 +63,7 @@ public class USD {
 		cents = retCents;
 	}
 
+	// todo add no negative USDs
 	public void subtractUSD(USD b) {
 		long retDollars = dollars - b.dollars;
 		int retCents = cents - b.cents;
