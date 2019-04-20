@@ -1,5 +1,10 @@
 package com.revature.BankProject;
 
-public class Account {
+import java.util.ArrayList;
 
+public class Account {
+	
+	ArrayList<Integer> userIDs = new ArrayList<Integer>();
+	
+	
 }
