@@ -11,9 +11,15 @@ public class USD {
 		// todo make sure basic non-empty, no specials, ect string checking already done
 		// by other
 
-		String[] splitStr = input.split(".");
-		dollars = Long.parseLong(splitStr[0]);
-		cents = Integer.parseInt(splitStr[1]);
+		String[] splitStr = input.split("\\.");
+		
+		if (splitStr.length > 1) {
+			dollars = Long.parseLong(splitStr[0]);
+			cents = Integer.parseInt(splitStr[1]);
+		} else {
+			dollars = Long.parseLong(input);
+//					dollars = 1;
+		}
 
 		// todo extra check for cents length
 		if (splitStr.length > 2) {

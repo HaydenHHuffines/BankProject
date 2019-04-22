@@ -1,6 +1,9 @@
 package com.revature.BankProject;
 
+import java.util.ArrayList;
 import java.util.Scanner; // Import the Scanner class
+import java.util.TreeSet;
+
 import javafx.util.Pair;
 
 /**
@@ -9,7 +12,7 @@ import javafx.util.Pair;
  */
 public class App {
 
-	private static State currentState = new State();
+	protected static State currentState = new State();
 
 	private static boolean keepExecuting = true;
 
@@ -18,6 +21,9 @@ public class App {
 	private static Menu mainMenu = new Menu();
 
 	public static void main(String[] args) {
+
+		TreeSet<User> 		userData 	= DummyData.gimmieDummyUsers();
+		ArrayList<Account> 	accountData = DummyData.gimmieDummyAccounts();
 
 		String inputText = "";
 
@@ -29,15 +35,15 @@ public class App {
 			System.out.print(outputText);
 			inputText = myScanner.nextLine();
 			Pair<String, Boolean> cleanInput = helperObject.cleanInput(inputText);
-			
-			if(cleanInput.getValue()==false) // if user attempted invalid input
-				continue;					// jump back to input loop
+
+			if (cleanInput.getValue() == false) // if user attempted invalid input
+				continue; // jump back to input loop
 
 			String cleanInputString = cleanInput.getKey();
-			//todo fork menu/io on single char commands and username/account id/ect
-			char cleanChar = cleanInputString.charAt(0);
-			
-			currentState = mainMenu.checkAndRunState(currentState, cleanChar);
+			// todo fork menu/io on single char commands and username/account id/ect
+			char cleanChar =  cleanInputString.toLowerCase().charAt(0);
+
+			currentState = mainMenu.checkAndRunState(currentState, cleanChar, cleanInputString);
 
 			Pair<String, Boolean> cleanText = helperObject.cleanInput(inputText);
 			inputText = cleanText.getKey();

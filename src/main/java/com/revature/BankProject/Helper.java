@@ -4,7 +4,7 @@ import  javafx.util.Pair;
 public class Helper {
 	Pair<String, Boolean> cleanInput(String userInput) {
 		String retInput = userInput.trim();
-		boolean validInput = true;
+		boolean isValidInput = true;
 		
 		String specialCharacters = ".*[\\{}();:].*" ;
 
@@ -13,15 +13,15 @@ public class Helper {
 					+ "\ntry again");
 			
 			retInput = "-2";
-			validInput = false;
+			isValidInput = false;
 		}
 		
 		if(retInput.length() > 64) {
 			System.out.println("no input above 64 characters in length is allowed");
 			retInput = "-2";
-			validInput = false;
+			isValidInput = false;
 		}
 		
-		return  new Pair<String, Boolean>(retInput, validInput);
+		return  new Pair<String, Boolean>(retInput, isValidInput);
 	}
 }

@@ -1,6 +1,6 @@
 package com.revature.BankProject;
 
-public class User {
+public class User implements Comparable<User> {
 	String name = "-1";
 	String password = "-1";
 	int ID = -1;
@@ -14,9 +14,19 @@ public class User {
 		name = userName;
 		password = userPass;
 	}
-	
-	User(){
-		
+
+	User() {
+
+	}
+
+	@Override
+	public int compareTo(User arg0) {
+		if (this.ID == arg0.ID) {
+			return 0;
+		} else if (this.ID < arg0.ID) {
+			return -1;
+		} else
+			return 1;
 	}
 
 }
