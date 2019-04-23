@@ -12,11 +12,11 @@ public class Menu {
 		validOptions.clear();
 
 		outputText += "q -\t quit program\n";
-		validOptions.add('e');
+		validOptions.add('q');
 
 		if (currentState.activeUser == null) {
-			outputText += "0 -\t login" + "\n" +
-						  "1 -\t submit request for new user\n";
+			outputText += "0 + username -\t login" + "\n" +
+						  "1 + username password -\t submit request for new user\n";
 			validOptions.add('l');
 			validOptions.add('n');
 		} else
@@ -57,6 +57,7 @@ public class Menu {
 			break;
 		case 'l': // login
 			System.out.println("inside runState: " + 'l');
+			
 			break;
 		case 'n': // new user application
 			System.out.println("inside runState: " + 'n');

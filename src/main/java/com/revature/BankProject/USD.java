@@ -56,7 +56,7 @@ public class USD {
 		return isValid;
 	}
 
-	public void addUSD(USD b) {
+	public boolean addUSD(USD b) {
 		long retDollars = dollars + b.dollars;
 		int retCents = cents + b.cents;
 
@@ -67,10 +67,12 @@ public class USD {
 
 		dollars = retDollars;
 		cents = retCents;
+		
+		return true;
 	}
 
 	// todo add no negative USDs
-	public void subtractUSD(USD b) {
+	public boolean subtractUSD(USD b) {
 		long retDollars = dollars - b.dollars;
 		int retCents = cents - b.cents;
 
@@ -81,9 +83,11 @@ public class USD {
 
 		if (retDollars < 0) {
 			errorMsg = "removing more than the USD amount!\n\tNo change made to this USD!";
+			return false;
 		} else {
 			dollars = retDollars;
 			cents = retCents;
+			return true;
 		}
 
 	}

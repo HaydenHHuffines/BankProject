@@ -6,13 +6,16 @@ public class User implements Comparable<User> {
 	int ID = -1;
 	char type = 'x';
 	char status = 'x';
+	String personalInformation = "-1";
 
-	User(char userType, char userStatus, int userID, String userName, String userPass) {
+	User(char userType, char userStatus, int userID, String userName, String userPass,
+			String personalInformationInput) {
 		type = userType;
 		status = userStatus;
 		ID = userID;
 		name = userName;
 		password = userPass;
+		personalInformation = personalInformationInput;
 	}
 
 	User() {
