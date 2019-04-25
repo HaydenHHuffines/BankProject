@@ -21,6 +21,10 @@ public class User implements Comparable<User> {
 	User() {
 
 	}
+	
+	protected void approveUser() {
+		status = 'a';
+	}
 
 	@Override
 	public int compareTo(User arg0) {
