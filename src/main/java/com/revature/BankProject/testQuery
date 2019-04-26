@@ -1,0 +1,3 @@
+CREATE TABLE testTable1 (fk_field1 int, field2 char);
+INSERT INTO testTable1 (fk_field1, field2) VALUES (5, 'd');
+SELECT * from testTable1;
