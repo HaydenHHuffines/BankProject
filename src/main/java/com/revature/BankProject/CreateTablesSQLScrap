@@ -1,0 +1,32 @@
+CREATE TABLE Users (
+    ID SERIAL NOT NULL PRIMARY KEY,
+    Name varchar(255) NOT NULL DEFAULT 'default',
+    Password varchar(255) NOT NULL ,
+    Type char DEFAULT 'c',
+    Status char DEFAULT 'p',
+    Note varchar(255) DEFAULT 'other details?'
+);
+
+DROP TABLE Users;
+
+INSERT INTO Users
+ (Name, Password, Note )
+VALUES
+ ('Abe', 'AbePass', 'testy test?');
+
+
+ CREATE TABLE Users_Accounts(
+	uID INT NOT NULL ,
+	aID INT NOT NULL
+);
+
+ 
+ 
+
+CREATE TABLE Accounts(
+	ID SERIAL NOT NULL PRIMARY KEY,
+	Status char DEFAULT 'p',
+	Balance varchar(255) DEFAULT '0.00'
+);
+
+

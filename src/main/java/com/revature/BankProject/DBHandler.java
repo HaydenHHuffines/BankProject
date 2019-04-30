@@ -6,13 +6,14 @@ import java.sql.SQLException;
 
 public class DBHandler {
 
-	protected static Connection establishConneciton() {
-		java.sql.Connection con = DoNotPush.getRemoteConnection();
-		
-		return con;
+	protected static Connection con;
+
+	protected static void establishConneciton() {
+		con = DoNotPush.getRemoteConnection();
+//		System.out.println("BP stalling in DBHandler establishConnection");
 	}
 
-	protected static ResultSet doSelectQuery(String queryIn, Connection con) {
+	private static ResultSet doExecuteQuery(String queryIn) {
 		java.sql.Statement stmt = null;
 		ResultSet rs = null;
 		try {
@@ -29,13 +30,57 @@ public class DBHandler {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
-		if(rs == null)
+
+		if (rs == null)
 			System.out.println("DBHandler doSelectQuery's result set is coming out null!");
-		
+
 		return rs;
 	}
+
+	private static int doExecuteUpdate(String queryIn) {
+		java.sql.Statement stmt = null;
+		int rowsAffected = -1;
+		try {
+			stmt = con.createStatement();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			rowsAffected = stmt.executeUpdate(queryIn);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		if (rowsAffected == -1) {
+			System.out.println("DBHandler's doExecuteQuery seems to have malfunctioned!");
+		}
+
+		return rowsAffected;
+	}
+
+	protected static boolean InsertPendingCustomer(String name, String password) {
+		if (con == null) {
+			System.out.println("InsertIntoUsers trying to make a new user in the DB when connection == null, yikes");
+			return false;
+		}
+
+		String insertQuery = "INSERT INTO Users " + "(Name, Password, Type, Status, Note)" + "VALUES (  \'" + name
+				+ "\', \'" + password + "\', 'c', 'p', 'new pending user')";
+
+		int rowsAffected = doExecuteUpdate(insertQuery);
+		if(rowsAffected != -1)
+			return true;
+		else return false;
+
+		/*
+		 * // INSERT INTO Users // (Name, Password, Type, Status, Note ) // VALUES //
+		 * ('Abe', 'AbePass', 'c', 'p', 'new pending user');
+		 */
+	}
 	
+//	protected static boolean todo
+	
+
 	protected static void printSQLResult(java.sql.ResultSet rsIn) {
 		try {
 			java.sql.ResultSetMetaData rsmd = rsIn.getMetaData();
@@ -53,5 +98,11 @@ public class DBHandler {
 			e.printStackTrace();
 		}
 	}
+
+	protected static void testDummyQuery() {
+		printSQLResult(doExecuteQuery("SELECT * FROM testTable1"));
+	}
+
+//	protected static void 
 
 }

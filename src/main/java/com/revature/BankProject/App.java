@@ -1,6 +1,6 @@
 package com.revature.BankProject;
 
-import java.sql.DriverManager;
+import java.sql.Connection;
 import java.sql.SQLException;
 
 //import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
@@ -14,10 +14,7 @@ import java.util.TreeSet;
 
 import javafx.util.Pair;
 
-/**
- * Hello world!
- *
- */
+
 public class App {
 
 	protected static State currentState = new State();
@@ -33,7 +30,9 @@ public class App {
 		TreeSet<User> userData = DummyData.gimmieDummyUsers();
 		ArrayList<Account> accountData = DummyData.gimmieDummyAccounts();
 
-		
+		DBHandler.establishConneciton(); // initialize DBHandler's con
+
+//		DBHandler.testDummyQuery();
 
 		String inputText = "";
 
@@ -53,7 +52,7 @@ public class App {
 			// todo fork menu/io on single char commands and username/account id/ect
 			char cleanChar = cleanInputString.toLowerCase().charAt(0);
 
-			currentState = mainMenu.checkAndRunState(currentState, cleanChar, cleanInputString);
+			currentState = mainMenu.checkAndRunState(currentState, (int)cleanChar, cleanInputString);
 
 			Pair<String, Boolean> cleanText = helperObject.cleanInput(inputText);
 			inputText = cleanText.getKey();
@@ -67,6 +66,20 @@ public class App {
 		System.out.println("Entered Text is: " + inputText); // Output user input
 		myScanner.close();
 
+	}
+	
+	protected static void closeAndExit() {
+		System.out.println("Thank you for using this system!");
+		
+		if(DBHandler.con != null)
+			try {
+				DBHandler.con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+		System.exit(0);
 	}
 
 }
