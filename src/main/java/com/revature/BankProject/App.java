@@ -38,15 +38,17 @@ public class App {
 
 		Scanner myScanner = new Scanner(System.in); // Create a Scanner object
 		System.out.println("Welcome to the system!");
-		String outputText = "";
+		
 		while (keepExecuting) {
-			outputText = mainMenu.navigateState(currentState);
-			System.out.print(outputText);
+			mainMenu.navigateState(currentState);
+			System.out.print(mainMenu.optionsText);
 			inputText = myScanner.nextLine();
 			Pair<String, Boolean> cleanInput = helperObject.cleanInput(inputText);
 
-			if (cleanInput.getValue() == false) // if user attempted invalid input
+			if (cleanInput.getValue() == false) {// if user attempted invalid input
+				System.out.println("invalid input detected");
 				continue; // jump back to input loop
+			}
 
 			String cleanInputString = cleanInput.getKey();
 			// todo fork menu/io on single char commands and username/account id/ect
@@ -54,13 +56,9 @@ public class App {
 
 			currentState = mainMenu.checkAndRunState(currentState, (int)cleanChar, cleanInputString);
 
-			Pair<String, Boolean> cleanText = helperObject.cleanInput(inputText);
-			inputText = cleanText.getKey();
-
-			if (!cleanText.getValue()) {
-
-			}
-
+			System.out.print(mainMenu.resultText);
+			mainMenu.resultText = "";
+//			System.out.println("breaaaaak poooooint");
 		}
 
 		System.out.println("Entered Text is: " + inputText); // Output user input
@@ -75,9 +73,9 @@ public class App {
 			try {
 				DBHandler.con.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		
 		
 		System.exit(0);
 	}

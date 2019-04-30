@@ -1,5 +1,7 @@
 package com.revature.BankProject;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.TreeSet;
 
 public class Account {
@@ -8,6 +10,7 @@ public class Account {
 //	TreeSet<User> customers ; //  maybe this is preferable? 
 	USD money;
 	char status;
+	int id;
 
 	Account(USD startingBalance, int initialOwnerID) {
 		money = startingBalance;
@@ -15,6 +18,12 @@ public class Account {
 		status = 'a';
 	}
 
+	Account(String startingBalance, int aID, char statusIn){
+		money = new USD(startingBalance);
+		id = aID;
+		status = statusIn;
+	}
+	
 	protected boolean isActiveAccount() {
 		if (status == 'a')
 			return true;
@@ -51,4 +60,44 @@ public class Account {
 		return false;
 	}
 
+	protected  String print4User() {
+		String retStr = "Account ID: " +id+"\t Available Balance: "+ money.toString()+"\n";
+		
+		return retStr;
+	}
+	protected  String print4Employee() {
+		String retStr = "Account ID: " +id+"\t Available Balance: "+ money+"\t Status: " + status+"\n";
+		
+		return retStr;
+	}
+	
+	
+	protected static Account parseRS(ResultSet rs) {
+		int id = -1;
+		char status = 'x';
+		String balance = "-1";
+		
+		try {
+			java.sql.ResultSetMetaData rsmd = rs.getMetaData();
+			int columnsNumber = rsmd.getColumnCount();
+			while (rs.next()) {
+				for (int i = 1; i <= columnsNumber; i++) {
+					String columnValue = rs.getString(i);
+					if(i == 1)
+						id = Integer.parseInt(columnValue);
+					else if(i == 2)
+						status = columnValue.charAt(0);
+					else if(i == 3)
+						balance = columnValue;
+					// System.out.print(columnValue + " " + rsmd.getColumnName(i));
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+//		System.out.println("Breakpoints! getcha breakpoints!");
+		return new Account(balance, id, status);
+		
+	}
 }

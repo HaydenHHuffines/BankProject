@@ -92,4 +92,8 @@ public class USD {
 
 	}
 
+	public String toString() {
+		return "" + dollars +"."+cents;
+	}
+	
 }

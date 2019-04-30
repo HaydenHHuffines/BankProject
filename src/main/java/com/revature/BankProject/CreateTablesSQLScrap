@@ -14,19 +14,43 @@ INSERT INTO Users
 VALUES
  ('Abe', 'AbePass', 'testy test?');
 
+INSERT INTO Users
+ (Name, Password, Status )
+VALUES
+ ('don', 'password', 'a');
+ 
+ SELECT * FROM Users ;
+ SELECT * FROM Users WHERE Name = 'bob' AND Password = 'password';
+ 
 
  CREATE TABLE Users_Accounts(
 	uID INT NOT NULL ,
 	aID INT NOT NULL
 );
 
- 
- 
+INSERT into Users_Accounts 
+		(uID, aID)
+VALUES	(4, 4);
+
+
+SELECT * FROM Users_Accounts;
+
+SELECT aID FROM Users_Accounts where uID = 3;
+
+
+
 
 CREATE TABLE Accounts(
 	ID SERIAL NOT NULL PRIMARY KEY,
 	Status char DEFAULT 'p',
 	Balance varchar(255) DEFAULT '0.00'
 );
+
+INSERT INTO Accounts
+		(Status, Balance)
+VALUES ('a', '700.04');
+
+SELECT * FROM ACCOUNTS;
+SELECT * FROM ACCOUNTS WHERE id = 2;
 
 
