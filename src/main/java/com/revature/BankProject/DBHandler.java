@@ -177,17 +177,16 @@ public class DBHandler {
 	}
 
 	protected static User loginCheck(String name, String password) {
-		ResultSet rs = doExecuteQuery(
-				"SELECT * FROM Users WHERE Name = '" + name + "' AND Password = '" + password + "';");
+		ResultSet rs = doExecuteQuery("SELECT * FROM Users WHERE Name = '" + name + "' AND Password = '" + password
+				+ "' AND Status <> 'd' AND Status <> 'r';");
 
 		User retUser = null;
-//		System.out.println("stalling for breakpoint");
 
 		retUser = User.parseRS(rs);
 		return retUser;
 	}
 
-	protected static ArrayList<Account> getUserAccounts(int userID) {
+	protected static ArrayList<Account> getBankAccounts(int userID) {
 		ArrayList<Account> retArrLst = new ArrayList<Account>();
 		ArrayList<Integer> aIDs = new ArrayList<Integer>();
 
@@ -216,13 +215,22 @@ public class DBHandler {
 	}
 
 	protected static Account getAccount(int aID) {
-		ResultSet rs = doExecuteQuery("SELECT * FROM Accounts where ID = " + aID + ";");
+		String query = "SELECT * FROM Accounts where ID = " + aID + ";" ;
+
+		ResultSet rs = doExecuteQuery(query);
 
 		return Account.parseRS(rs);
 	}
 
 	protected static User getUserFromName(String nameIn) {
 		ResultSet rs = doExecuteQuery("SELECT * FROM Users WHERE Name = '" + nameIn + "';");
+		User retUser = null;
+		retUser = User.parseRS(rs);
+		return retUser;
+	}
+
+	protected static User getUserFromID(int id) {
+		ResultSet rs = doExecuteQuery("SELECT * FROM Users WHERE ID = '" + id + "';");
 		User retUser = null;
 		retUser = User.parseRS(rs);
 		return retUser;
@@ -245,7 +253,53 @@ public class DBHandler {
 			return true;
 		else
 			return false;
+	}
 
+	protected static ArrayList<User> getUserAccounts(User whoAsking, int offset, int limit) {
+		ArrayList<User> retArrLst = new ArrayList<User>();
+
+		ResultSet rs = null;
+
+		if (whoAsking.type == 'e') {
+			rs = doExecuteQuery("SELECT * FROM Users WHERE type = 'c' AND status <> 'd' ORDER BY ID LIMIT " + limit
+					+ " OFFSET " + offset + ";");
+		} else if (whoAsking.type == 'a') {
+			rs = doExecuteQuery("SELECT * FROM Users ORDER BY ID LIMIT " + limit + " OFFSET " + offset + ";");
+		}
+
+		try {
+
+			User addMe = new User();
+			java.sql.ResultSetMetaData rsmd = rs.getMetaData();
+			int columnsNumber = rsmd.getColumnCount();
+
+			if (rs == null)
+				System.out.println("Woah there, rs == null in DBHandler getUserAccounts");
+			else
+				while (rs.next()) {
+					addMe = new User();
+					for (int i = 1; i <= columnsNumber; i++) {
+						String columnValue = rs.getString(i);
+						if (i == 1)
+							addMe.ID = Integer.parseInt(columnValue);
+						else if (i == 2)
+							addMe.name = columnValue;
+						else if (i == 3)
+							addMe.password = columnValue;
+						else if (i == 4)
+							addMe.type = columnValue.charAt(0);
+						else if (i == 5)
+							addMe.status = columnValue.charAt(0);
+						else if (i == 6)
+							addMe.extraNote = columnValue;
+					}
+					retArrLst.add(addMe);
+				}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return retArrLst;
 	}
 
 }

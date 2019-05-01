@@ -7,12 +7,15 @@ CREATE TABLE Users (
     Note varchar(255) DEFAULT 'other details?'
 );
 
-DROP TABLE Users;
+SELECT * FROM Users WHERE type = 'c' AND status <> 'd' ORDER BY ID LIMIT 99 OFFSET 0;
+
+
+DROP TAB---LE Users;
 
 INSERT INTO Users
- (Name, Password, Note )
+ (Name, Password, Note, Status )
 VALUES
- ('Abe', 'AbePass', 'testy test?');
+ ('Avery', 'password', 'this is a note', 'a');
 
 INSERT INTO Users
  (Name, Password, Status )
@@ -35,14 +38,14 @@ VALUES
 
 INSERT into Users_Accounts 
 		(uID, aID)
-VALUES	(4, 4);
+VALUES	(16, 6);
 
 
 SELECT * FROM Users_Accounts;
 
 SELECT aID FROM Users_Accounts where uID = 3;
 
-
+SELECT * FROM Users_Accounts where uID = 16;
 
 
 CREATE TABLE Accounts(
@@ -53,10 +56,18 @@ CREATE TABLE Accounts(
 
 INSERT INTO Accounts
 		(Status, Balance)
-VALUES ('a', '700.04');
+VALUES ('a', '400.00');
 
 SELECT * FROM ACCOUNTS;
 SELECT * FROM ACCOUNTS WHERE id = 2;
+
+SELECT *
+  FROM Users
+  JOIN Users_Accounts 
+    ON Users_Accounts.uID = Users.ID
+  JOIN Accounts
+    ON Accounts.ID = Users_Accounts.aID
+ WHERE Users.ID = 17 ;
 
 
 

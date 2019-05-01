@@ -27,9 +27,6 @@ public class App {
 
 	public static void main(String[] args) {
 
-		TreeSet<User> userData = DummyData.gimmieDummyUsers();
-		ArrayList<Account> accountData = DummyData.gimmieDummyAccounts();
-
 		DBHandler.establishConneciton(); // initialize DBHandler's con
 
 		String inputText = "";
@@ -58,7 +55,7 @@ public class App {
 			mainMenu.resultText = "";
 		}
 
-		System.out.println("Entered Text is: " + inputText); // Output user input
+//		System.out.println("Entered Text is: " + inputText); // Output user input
 		myScanner.close();
 
 	}

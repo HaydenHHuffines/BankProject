@@ -1,5 +1,6 @@
 package com.revature.BankProject;
 
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
@@ -30,18 +31,18 @@ public class Menu {
 					if (currentState.activeAccount == null) {
 
 						validOptions.add((int) 'a'); // change active/selected account
-						optionsText += "'a  account number' \t\t-select account\n";
-						printCustomerAccounts(currentState.activeUser.ID);
+						optionsText += "'a  account number' \t\t\t-select account\n";
+						printCustomerBankAccounts(currentState.activeUser.ID);
 
 						validOptions.add((int) 'c'); // create new account
-						optionsText += "'c' \t\t\t-apply for new account\n";
+						optionsText += "'c' \t\t\t\t\t-apply for new account\n";
 
 					} else {
 						optionsText = currentState.activeAccount.print4User() + "\n" + optionsText;
 
-						validOptions.add((int) 'a'); 
+						validOptions.add((int) 'a');
 						optionsText += "'a  0' \t\t\t\t\t-deselect current account\n";
-						
+
 						validOptions.add((int) 'j'); // change to joint account
 						optionsText += "'j  username' \t\t\t\t-add user as joint account owner\n";
 
@@ -65,17 +66,22 @@ public class Menu {
 			case 'e': // employee
 			{
 				if (currentState.targetUser == null) {
+					validOptions.add((int) 'v'); // view users
+					optionsText += "'v #ofUserToSee #ofStartingOffset'\t-view many users\n";
+					
 					validOptions.add((int) 's'); // select user
-					optionsText += "'s  username OR account number' -\t select user\n";
-				} else if (currentState.activeAccount == null) {
+					optionsText += "'s  id#' \t\t\t\t-select user\n";
+					
 					validOptions.add((int) 'u'); // approve pending user
-					optionsText += "'u'  \t\t-approve pending user account\n";
+					optionsText += "'u id#'  \t\t\t\t-approve pending user account\n";
 
-					validOptions.add((int) 'x'); // deny pending user
-					optionsText += "'x'  \t\t-deny pending user account\n";
+					validOptions.add((int) 'r'); // deny pending user
+					optionsText += "'r id#'  \t\t\t\t-reject user account\n";
+				} else if (currentState.activeAccount == null) {
+					
 
-					validOptions.add((int) 'b'); // approve bank account
-					optionsText += "'b  account number' \t-approve bank account";
+//					validOptions.add((int) 'b'); // approve bank account
+//					optionsText += "'b  id# number' \t\t-approve bank account";
 				}
 			}
 			case 'a': // admin falling through to this from employee case
@@ -135,10 +141,16 @@ public class Menu {
 			case (int) 'l': // login
 				// System.out.println("inside runState: " + 'l');
 				if (splitInput.length > 2) {
-					State.activeUser = DBHandler.loginCheck(splitInput[1], splitInput[2]);
+					User loggedInUser = DBHandler.loginCheck(splitInput[1], splitInput[2]);
+					if (loggedInUser.isValid())
+						State.activeUser = loggedInUser;
+					else
+						resultText += "Login failed! Please check your arguments\n";
+
 				} else
 					resultText += "Invalid login arguments!\n";
 				break;
+
 			case (int) 'n': // new user application
 				System.out.println("inside runState: " + 'n');
 				if (cleanInputString.split(" ").length == 3)
@@ -150,11 +162,12 @@ public class Menu {
 				try {
 					int inpAccID = Integer.parseInt(splitInput[1]);
 
-					if(inpAccID == 0) { // command to deselect account
+					if (inpAccID == 0) { // command to deselect account
 						retState.activeAccount = null;
+						resultText += "Desected active bank account\n";
 						break;
 					}
-					
+
 					boolean foundIt = false;
 					for (int a_id : getCustomerAccounts(retState.activeUser.ID)) {
 						if (a_id == inpAccID)
@@ -175,7 +188,6 @@ public class Menu {
 				break;
 
 			case (int) 'j':// add joint user
-				// todo DBHANDLLLLLEEEER
 				if (splitInput.length == 2)
 					if (DBHandler.addJointUser(retState.activeUser, retState.activeAccount, splitInput[1]))
 						resultText += "User " + splitInput[1] + " should now have access to this account!\n";
@@ -192,8 +204,7 @@ public class Menu {
 						else if (retState.activeAccount.MakeWithdrawal(toWithdraw)) {
 							if (DBHandler.updateAccountBalance(retState.activeAccount))
 								resultText += "Amount has been withdrawn and account updated\n";
-						}
-						else
+						} else
 							resultText += "Woah there, you can't withdraw that much\n";
 
 					} catch (Exception e) {
@@ -219,37 +230,88 @@ public class Menu {
 				} else
 					resultText += "No change made, be certain your input is valid.\n";
 				break;
-				
-			case (int) 't':	// transfer money
-				if(splitInput.length == 3) {
+
+			case (int) 't': // transfer money
+				if (splitInput.length == 3) {
 					USD toTransfer = new USD(splitInput[1]);
-					if(!toTransfer.checkIfValid()) {
+					if (!toTransfer.checkIfValid()) {
 						resultText += "Hey, that's not a valid dollars.cents\n";
 						break;
-					}
-					else {
-						Account intoAccount = DBHandler.getAccount(Integer.parseInt( splitInput[2]));
-						if(intoAccount != null && intoAccount.id != -1) {
-							 if (retState.activeAccount.MakeWithdrawal(toTransfer)) {
+					} else {
+						Account intoAccount = DBHandler.getAccount(Integer.parseInt(splitInput[2]));
+						if (intoAccount != null && intoAccount.id != -1) {
+							if (retState.activeAccount.MakeWithdrawal(toTransfer)) {
 								if (DBHandler.updateAccountBalance(retState.activeAccount))
-									if(intoAccount.MakeDeposit(toTransfer))
-										if(DBHandler.updateAccountBalance(intoAccount))
+									if (intoAccount.MakeDeposit(toTransfer))
+										if (DBHandler.updateAccountBalance(intoAccount))
 											resultText += "Amount has been transfered and accounts updated\n";
-							}
-							else
+							} else
 								resultText += "Woah there, you can't withdraw/transfer that much\n";
+						} else
+							resultText += "Check that the recipient account is valid\n"
+									+ "You might consider asking an employee for assistance\n";
+					}
+				} else
+					resultText += "Please check your input\n";
+
+				break;
+
+			case (int) 'v': // view customers
+				if (splitInput.length == 3) {
+					try {
+						int limit = Integer.parseInt(splitInput[1]);
+						int offset = Integer.parseInt(splitInput[2]);
+						ArrayList<User> users = DBHandler.getUserAccounts(retState.activeUser, offset, limit);
+						for (User user : users) {
+							System.out.println(user.toString());
+						}
+					} catch (Exception e) {
+						resultText += "Please check your input, arguments likely invalid\n";
+					}
+				} else
+					resultText += "Please check your input, need three arguments\n";
+				break;
+
+			case (int) 's': // select user
+				if (splitInput.length == 2) {
+					try {
+						int id = Integer.parseInt(splitInput[1]);
+						User user = DBHandler.getUserFromID(id);
+						if (user.isValid()) {
+							retState.targetUser = user;
+							resultText += "User account has been selected\n";
 						}
 						else
-							resultText += "Check that the recipient account is valid\n"
-							+ "You might consider asking an employee for assistance\n";
+							throw new NumberFormatException();
+					} catch (Exception e) {
+						resultText += "Please check your input, arguments likely invalid\n";
 					}
-				}
-				else
-					resultText += "Please check your input\n";
+				} else
+					resultText += "Please check your input, need two arguments\n";
+				break;
+				
+			case (int) 'r':
+				if (splitInput.length == 2) {
+					try {
+						int id = Integer.parseInt(splitInput[1]);
+						User user = DBHandler.getUserFromID(id);
+						if (user.isValid()) {
+							user.status = 'r'; //todo
+							resultText += "User account has been rejected and table updated\n";
+						}
+						else
+							throw new NumberFormatException();
+					} catch (Exception e) {
+						resultText += "Please check your input, arguments likely invalid\n";
+					}
+				} else
+					resultText += "Please check your input, need two arguments\n";
+				break;
 			
+			case(int) 'u':
+				
 				break;
 			}
-
 		} else {
 			switch (option) { // no argument options
 			case (int) 'q':// exit
@@ -261,9 +323,9 @@ public class Menu {
 		return retState;
 	}
 
-	protected void printCustomerAccounts(int id) {
+	protected void printCustomerBankAccounts(int id) {
 		// load and list valid accounts
-		ArrayList<Account> accounts = DBHandler.getUserAccounts(id);
+		ArrayList<Account> accounts = DBHandler.getBankAccounts(id);
 		for (Account acc : accounts) {
 			System.out.print(acc.print4User());
 		}
@@ -271,7 +333,7 @@ public class Menu {
 
 	protected ArrayList<Integer> getCustomerAccounts(int id) {
 		ArrayList<Integer> retArrLst = new ArrayList<Integer>();
-		ArrayList<Account> accounts = DBHandler.getUserAccounts(id);
+		ArrayList<Account> accounts = DBHandler.getBankAccounts(id);
 		for (Account acc : accounts) {
 			retArrLst.add(acc.id);
 		}
