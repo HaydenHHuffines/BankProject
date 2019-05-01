@@ -235,7 +235,17 @@ public class DBHandler {
 				return true;
 			else
 				return false;
-		else return false;
+		else
+			return false;
+	}
+
+	protected static boolean updateAccountBalance(Account account) {
+		if (doExecuteUpdate(
+				"UPDATE Accounts SET Balance = '" + account.money + "' WHERE ID = " + account.id + ";") == 1)
+			return true;
+		else
+			return false;
+
 	}
 
 }

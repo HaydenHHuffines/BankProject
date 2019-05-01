@@ -14,12 +14,12 @@ public class Menu {
 		// resultText = "";
 		validOptions.clear();
 
-		optionsText += "q -\t\t quit program\n";
+		optionsText += "'q' \t\t\t\t\t-quit program\n";
 		validOptions.add((int) 'q');
 
 		if (currentState.activeUser == null) {
-			optionsText += "l + username + password -\t login" + "\n"
-					+ "n + username + password -\t submit request for new user\n";
+			optionsText += "'l  username  password' \t\t-login" + "\n"
+					+ "'n  username  password' \t\t-submit request for new user\n";
 			validOptions.add((int) 'l');
 			validOptions.add((int) 'n');
 		} else
@@ -30,26 +30,29 @@ public class Menu {
 					if (currentState.activeAccount == null) {
 
 						validOptions.add((int) 'a'); // change active/selected account
-						optionsText += "a + account number -\t select account\n";
+						optionsText += "'a  account number' \t\t-select account\n";
 						printCustomerAccounts(currentState.activeUser.ID);
 
 						validOptions.add((int) 'c'); // create new account
-						optionsText += "c -\t\t apply for new account\n";
+						optionsText += "'c' \t\t\t-apply for new account\n";
 
 					} else {
-						currentState.activeAccount.print4User();
+						optionsText = currentState.activeAccount.print4User() + "\n" + optionsText;
 
+						validOptions.add((int) 'a'); 
+						optionsText += "'a  0' \t\t\t\t\t-deselect current account\n";
+						
 						validOptions.add((int) 'j'); // change to joint account
-						optionsText += "j + username -\t add user as joint account owner\n";
+						optionsText += "'j  username' \t\t\t\t-add user as joint account owner\n";
 
 						validOptions.add((int) 'w'); // withdraw
-						optionsText += "w + dollars.cents -\t withdraw money from account\n";
+						optionsText += "'w  dollars.cents' \t\t\t-withdraw money from account\n";
 
 						validOptions.add((int) 't'); // transfer
-						optionsText += "t + dollars.cents + account number -\t transfer money to other account\n";
+						optionsText += "'t  dollars.cents  account number' \t-transfer money to other account\n";
 
 						validOptions.add((int) 'd');// deposit
-						optionsText += "d + dollars.cents -\t deposit money into selected account\n";
+						optionsText += "'d  dollars.cents' \t\t\t-deposit money into selected account\n";
 					}
 				} else if (currentState.activeUser.status == 'p') { // pending user
 					System.out.print("Hey! Thank your for your interest in our bank, once an employee approves"
@@ -63,16 +66,16 @@ public class Menu {
 			{
 				if (currentState.targetUser == null) {
 					validOptions.add((int) 's'); // select user
-					optionsText += "s + username OR account number -\t select user\n";
+					optionsText += "'s  username OR account number' -\t select user\n";
 				} else if (currentState.activeAccount == null) {
 					validOptions.add((int) 'u'); // approve pending user
-					optionsText += "u  -\t\t approve pending user account\n";
+					optionsText += "'u'  \t\t-approve pending user account\n";
 
 					validOptions.add((int) 'x'); // deny pending user
-					optionsText += "x  -\t\t deny pending user account\n";
+					optionsText += "'x'  \t\t-deny pending user account\n";
 
 					validOptions.add((int) 'b'); // approve bank account
-					optionsText += "b + account number -\t approve bank account";
+					optionsText += "'b  account number' \t-approve bank account";
 				}
 			}
 			case 'a': // admin falling through to this from employee case
@@ -87,16 +90,16 @@ public class Menu {
 
 				} else {
 					validOptions.add((int) 'j'); // change to joint account
-					optionsText += "j + username -\t add user as joint account owner\n";
+					optionsText += "'j  username' \t\t\t\t-add user as joint account owner\n";
 
 					validOptions.add((int) 'w'); // withdraw
-					optionsText += "w + dollars.cents -\t withdraw money from account\n";
+					optionsText += "'w  dollars.cents' \t\t\t-withdraw money from account\n";
 
 					validOptions.add((int) 't'); // transfer
-					optionsText += "t + dollars.cents + account number -\t transfer money to other account\n";
+					optionsText += "'t  dollars.cents  account number' \t-transfer money to other account\n";
 
 					validOptions.add((int) 'd');// deposit
-					optionsText += "d + dollars.cents -\t deposit money into selected account\n";
+					optionsText += "'d  dollars.cents' \t\t\t-deposit money into selected account\n";
 
 					validOptions.add(0);// cancel account
 					optionsText += "0 - \t\t cancel this account (must be empty)\n";
@@ -144,11 +147,14 @@ public class Menu {
 				break;
 
 			case (int) 'a': // change active/selected account
-				System.out.println("inside runState: " + 'a');
-
 				try {
 					int inpAccID = Integer.parseInt(splitInput[1]);
 
+					if(inpAccID == 0) { // command to deselect account
+						retState.activeAccount = null;
+						break;
+					}
+					
 					boolean foundIt = false;
 					for (int a_id : getCustomerAccounts(retState.activeUser.ID)) {
 						if (a_id == inpAccID)
@@ -181,17 +187,72 @@ public class Menu {
 				if (splitInput.length == 2) {
 					try {
 						USD toWithdraw = new USD(splitInput[1]);
+						if (!toWithdraw.checkIfValid())
+							resultText += "Hey hey, that dollars.cents is not valid\n";
+						else if (retState.activeAccount.MakeWithdrawal(toWithdraw)) {
+							if (DBHandler.updateAccountBalance(retState.activeAccount))
+								resultText += "Amount has been withdrawn and account updated\n";
+						}
+						else
+							resultText += "Woah there, you can't withdraw that much\n";
+
 					} catch (Exception e) {
 						resultText += "Hey, you need to enter a valid dollar.cents to attempt a withdraw\n";
 					}
+				} else
+					resultText += "No change made, be certain your input is valid.\n";
+				break;
+
+			case (int) 'd': // deposit money
+				if (splitInput.length == 2) {
+					try {
+						USD toDeposit = new USD(splitInput[1]);
+						if (!toDeposit.checkIfValid())
+							resultText += "Hey hey, that dollars.cents is not valid\n";
+						else if (retState.activeAccount.MakeDeposit(toDeposit)) {
+							if (DBHandler.updateAccountBalance(retState.activeAccount))
+								resultText += "Amount has been deposited and account updated\n";
+						}
+					} catch (Exception e) {
+						resultText += "Hey, you need to enter a valid dollar.cents to attempt a deposit!\n";
+					}
+				} else
+					resultText += "No change made, be certain your input is valid.\n";
+				break;
+				
+			case (int) 't':	// transfer money
+				if(splitInput.length == 3) {
+					USD toTransfer = new USD(splitInput[1]);
+					if(!toTransfer.checkIfValid()) {
+						resultText += "Hey, that's not a valid dollars.cents\n";
+						break;
+					}
+					else {
+						Account intoAccount = DBHandler.getAccount(Integer.parseInt( splitInput[2]));
+						if(intoAccount != null && intoAccount.id != -1) {
+							 if (retState.activeAccount.MakeWithdrawal(toTransfer)) {
+								if (DBHandler.updateAccountBalance(retState.activeAccount))
+									if(intoAccount.MakeDeposit(toTransfer))
+										if(DBHandler.updateAccountBalance(intoAccount))
+											resultText += "Amount has been transfered and accounts updated\n";
+							}
+							else
+								resultText += "Woah there, you can't withdraw/transfer that much\n";
+						}
+						else
+							resultText += "Check that the recipient account is valid\n"
+							+ "You might consider asking an employee for assistance\n";
+					}
 				}
+				else
+					resultText += "Please check your input\n";
+			
 				break;
 			}
 
 		} else {
 			switch (option) { // no argument options
 			case (int) 'q':// exit
-//			System.out.println("inside runState: " + 'q');
 				App.closeAndExit();
 				break;
 			}

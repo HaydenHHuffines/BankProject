@@ -93,7 +93,10 @@ public class USD {
 	}
 
 	public String toString() {
-		return "" + dollars +"."+cents;
+		if( ("" +cents).length() == 2)
+			return "" + dollars +"."+cents;
+		else //if((""+cents).length() == 1)
+			return "" + dollars +"."+cents+"0";
 	}
 	
 }

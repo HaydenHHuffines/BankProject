@@ -6,10 +6,10 @@ public class Helper {
 		String retInput = userInput.trim();
 		boolean isValidInput = true;
 		
-		String specialCharacters = ".*[\\{}();:].*" ;
+		String specialCharacters = ".*[\\{}();:]=|\\..*" ;
 
 		if (retInput.matches(specialCharacters)) {
-			System.out.println("no special characters are allowed: \"\\{}();:\""
+			System.out.println("no special characters are allowed: \"\\{}().|;:\"="
 					+ "\ntry again");
 			
 			retInput = "-2";

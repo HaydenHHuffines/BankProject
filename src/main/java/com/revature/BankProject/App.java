@@ -58,7 +58,6 @@ public class App {
 
 			System.out.print(mainMenu.resultText);
 			mainMenu.resultText = "";
-//			System.out.println("breaaaaak poooooint");
 		}
 
 		System.out.println("Entered Text is: " + inputText); // Output user input
