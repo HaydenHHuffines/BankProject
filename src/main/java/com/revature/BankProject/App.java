@@ -32,8 +32,6 @@ public class App {
 
 		DBHandler.establishConneciton(); // initialize DBHandler's con
 
-//		DBHandler.testDummyQuery();
-
 		String inputText = "";
 
 		Scanner myScanner = new Scanner(System.in); // Create a Scanner object
@@ -66,7 +64,7 @@ public class App {
 	}
 	
 	protected static void closeAndExit() {
-		System.out.println("Thank you for using this system!");
+		System.out.println("Thank you user, for using this system!");
 		
 		if(DBHandler.con != null)
 			try {

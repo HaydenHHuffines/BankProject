@@ -5,5 +5,4 @@ public class State {
 	public static Account activeAccount = null;
 	public static User targetUser = null;
 	public static Account targetAccount = null;
-	public static String cheatString = "";
 }
